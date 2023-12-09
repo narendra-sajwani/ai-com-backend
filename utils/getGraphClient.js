@@ -40,7 +40,7 @@ const getAddressQuery = (req, res) => {
   return graphQuery;
 };
 
-const getCommonERC20Query = (req, ress) => {
+const getCommonERC20Query = (req, res) => {
   console.log(req);
   const graphQuery = `
   query MyQuery {
@@ -68,4 +68,37 @@ const getCommonERC20Query = (req, ress) => {
   return graphQuery;
 };
 
-module.exports = { getApolloClient, getAddressQuery, getCommonERC20Query };
+const getCommonNFTQuery = (req, res) => {
+  const graphQuery = `
+  query MyQuery {
+    TokenBalances(
+      input: {filter: {owner: {_eq: "${req.receiver}"}, tokenType: {_in: [ERC721, ERC1155]}}, blockchain: polygon}
+    ) {
+      TokenBalance {
+        token {
+          tokenBalances(
+            input: {filter: {owner: {_eq: "${req.sender}"}, tokenType: {_in: [ERC721, ERC1155]}}}
+          ) {
+            id
+            token {
+              address
+              symbol
+              name
+              baseURI
+            }
+          }
+        }
+      }
+    }
+  }
+  `;
+
+  return graphQuery;
+};
+
+module.exports = {
+  getApolloClient,
+  getAddressQuery,
+  getCommonERC20Query,
+  getCommonNFTQuery,
+};

@@ -3,10 +3,12 @@ const {
   getApolloClient,
   getAddressQuery,
   getCommonERC20Query,
+  getCommonNFTQuery,
 } = require("../utils/getGraphClient");
 const { init } = require("@airstack/node");
 const { config } = require("dotenv");
-
+const { OpenAI } = require("openai");
+const fs = require("fs");
 config();
 
 const openai = new OpenAI({
@@ -43,39 +45,53 @@ const getChatData = async (req, res) => {
     const aiResponseContent = aiResponse.choices[0].message.content;
     const [action, receiver] = aiResponseContent.split(" ");
     console.log(action, receiver);
-  
-  const graphApiUrl = "https://api-v2.lens.dev/";
-  const apolloClient = getApolloClient(graphApiUrl);
-  // console.log(req.data);
-  if (req.body.data.lens) {
-    const graphQuery = getAddressQuery(req.body.data.receiver);
-    // console.log(graphQuery);
 
-    var response = await apolloClient.query({
-      query: gql(graphQuery),
-    });
-    var address = response.data.profile.ownedBy.address;
-  } else {
-    var address = req.body.data.receiver;
+    let isLens = receiver.includes("lens/");
+    console.log(isLens);
+
+    const graphApiUrl = "https://api-v2.lens.dev/";
+    const apolloClient = getApolloClient(graphApiUrl);
+    // console.log(req.data);
+    if (isLens) {
+      const graphQuery = getAddressQuery(receiver);
+      // console.log(graphQuery);
+
+      var response = await apolloClient.query({
+        query: gql(graphQuery),
+      });
+      var address = response.data.profile.ownedBy.address;
+    } else {
+      var address = receiver;
+    }
+
+    const obj = {
+      sender: req.body.currentUser,
+      receiver: address,
+    };
+    const commonTokenQuery = getCommonERC20Query(obj);
+    const commonNFTQuery = getCommonNFTQuery(obj);
+    console.log(commonNFTQuery);
+
+    const tokenResult = await fetchQuery(commonTokenQuery);
+    if (tokenResult.error) {
+      throw new Error(error.message);
+    }
+    const nftResult = await fetchQuery(commonNFTQuery);
+    if (nftResult.error) {
+      throw new Error(nftResult.error);
+    }
+    // console.log(nftData);
+
+    const final = {
+      address,
+      tokens: tokenResult.data,
+      nfts: nftResult.data,
+      action,
+    };
+    res.send(final);
+  } catch (e) {
+    console.log("error", e);
   }
-
-  const obj = {
-    sender: req.body.data.currentUser,
-    receiver: address,
-  };
-  const commonQuery = getCommonERC20Query(obj);
-  console.log(commonQuery);
-
-  const { data, error } = await fetchQuery(commonQuery);
-  if (error) {
-    throw new Error(error.message);
-  }
-  console.log(data);
-  const final = {
-    address,
-    data,
-  };
-  res.send(final);
 };
 
 module.exports = { getChatData };
