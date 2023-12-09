@@ -11,8 +11,13 @@ import { fetchQuery } from "@airstack/node";
 
 const getChatData = async (req, res) => {
   //hit narendra's ai
-  //input="start a chat with xyz.lens" == Output="lens/xyz,"
-  //input="start a chat with xyz.ens" == Output="xyz.eth,xmtp_chat_ens"
+  //input="start a chat with xyz.lens" == Output={"xmtp_chat_lens", "lens/xyz"}
+
+  //input="start a chat with xyz.ens" == Output={"xmtp_chat_address", "<address>"}
+
+  //input="start a huddle with <address>" == Output={"huddle_meet_address", "<address>"}
+
+  //
 
   const graphApiUrl = "https://api-v2.lens.dev/";
   const apolloClient = getApolloClient(graphApiUrl);
