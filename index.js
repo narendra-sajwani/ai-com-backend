@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const userRouter = require("./routes/userRoutes.js");
 const chatRouter = require("./routes/userChats.js");
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
