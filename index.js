@@ -3,9 +3,6 @@ const app = express();
 const userRouter = require("./routes/userRoutes.js");
 const chatRouter = require("./routes/userChats.js");
 const port = 3000;
-import { config } from "dotenv";
-
-config();
 
 app.use(express.json());
 

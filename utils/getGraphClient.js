@@ -40,7 +40,8 @@ const getAddressQuery = (req, res) => {
   return graphQuery;
 };
 
-const getCommonERC20Query = (req, res) => {
+const getCommonERC20Query = (req, ress) => {
+  console.log(req);
   const graphQuery = `
   query MyQuery {
     TokenBalances(

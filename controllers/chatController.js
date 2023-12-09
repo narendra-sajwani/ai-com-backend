@@ -4,12 +4,18 @@ const {
   getAddressQuery,
   getCommonERC20Query,
 } = require("../utils/getGraphClient");
-import { init } from "@airstack/node";
+const { init } = require("@airstack/node");
+const { config } = require("dotenv");
+
+config();
 
 init(process.env.AIRSTACK_API_KEY);
-import { fetchQuery } from "@airstack/node";
+const { fetchQuery } = require("@airstack/node");
 
 const getChatData = async (req, res) => {
+  // Data is 'req': -currentUser: address of current user
+  // -              - receiver: address of receiver
+
   //hit narendra's ai
   //input="start a chat with xyz.lens" == Output={"xmtp_chat_lens", "lens/xyz"}
 
@@ -18,28 +24,35 @@ const getChatData = async (req, res) => {
   //input="start a huddle with <address>" == Output={"huddle_meet_address", "<address>"}
 
   //
-
   const graphApiUrl = "https://api-v2.lens.dev/";
   const apolloClient = getApolloClient(graphApiUrl);
-  const graphQuery = getAddressQuery("lens/spicegirl");
-  console.log(graphQuery);
+  // console.log(req.data);
+  if (req.body.data.lens) {
+    const graphQuery = getAddressQuery(req.body.data.receiver);
+    // console.log(graphQuery);
 
-  var response = await apolloClient.query({
-    query: gql(graphQuery),
-  });
-  // console.log(response.data.profile.ownedBy.address);
+    var response = await apolloClient.query({
+      query: gql(graphQuery),
+    });
+    var address = response.data.profile.ownedBy.address;
+  } else {
+    var address = req.body.data.receiver;
+  }
+
   const obj = {
-    sender: "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
-    receiver: response.data.profile.ownedBy.address,
+    sender: req.body.data.currentUser,
+    receiver: address,
   };
-
   const commonQuery = getCommonERC20Query(obj);
   console.log(commonQuery);
 
-  const { data, error } = await fetchQuery(query);
+  const { data, error } = await fetchQuery(commonQuery);
+  if (error) {
+    throw new Error(error.message);
+  }
   console.log(data);
   const final = {
-    address: response.data.profile.ownedBy.address,
+    address,
     data,
   };
   res.send(final);
