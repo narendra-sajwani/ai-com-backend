@@ -88,13 +88,3 @@
 {"messages": [{"role": "system", "content": "Welcome to the Graph demo. You can ask me questions about the Lens, ENS Handles, and POaP NFTs."}, {"role": "user", "content": "start huddle meet with 0x34da5465d14054756814ada90b50285d2ec72057"}, {"role": "assistant", "content": "huddle_meet_address 0x34da5465d14054756814ada90b50285d2ec72057"}]}
 {"messages": [{"role": "system", "content": "Welcome to the Graph demo. You can ask me questions about the Lens, ENS Handles, and POaP NFTs."}, {"role": "user", "content": "start huddle meet with 0x000001f568875f378bf6d170b790967fe429c81a"}, {"role": "assistant", "content": "huddle_meet_address 0x000001f568875f378bf6d170b790967fe429c81a"}]}
 {"messages": [{"role": "system", "content": "Welcome to the Graph demo. You can ask me questions about the Lens, ENS Handles, and POaP NFTs."}, {"role": "user", "content": "start huddle meet with 0x602ce0bb5ef580766b121577d9f88916412ef036"}, {"role": "assistant", "content": "huddle_meet_address 0x602ce0bb5ef580766b121577d9f88916412ef036"}]}
-
-
-
-
-
-
-
-
-
-

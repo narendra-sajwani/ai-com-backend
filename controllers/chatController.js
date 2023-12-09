@@ -9,21 +9,41 @@ const { config } = require("dotenv");
 
 config();
 
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API,
+});
+
 init(process.env.AIRSTACK_API_KEY);
 const { fetchQuery } = require("@airstack/node");
 
 const getChatData = async (req, res) => {
-  // Data is 'req': -currentUser: address of current user
-  // -              - receiver: address of receiver
+  const userMessage = req.body.message;
 
-  //hit narendra's ai
-  //input="start a chat with xyz.lens" == Output={"xmtp_chat_lens", "lens/xyz"}
+  if (typeof userMessage !== "string" || userMessage.trim() === "") {
+    return res.status(400).json({ error: "Invalid user message" });
+  }
 
-  //input="start a chat with xyz.ens" == Output={"xmtp_chat_address", "<address>"}
+  const chats = [
+    {
+      role: "system",
+      content:
+        "Welcome to the Graph demo. You can ask me questions about the Lens, ENS Handles, and POaP NFTs",
+    },
+    { role: "user", content: userMessage },
+  ];
 
-  //input="start a huddle with <address>" == Output={"huddle_meet_address", "<address>"}
+  const trainedModelID = fs.readFileSync("trainedModelID.txt").toString();
 
-  //
+  try {
+    const aiResponse = await openai.chat.completions.create({
+      model: trainedModelID,
+      messages: chats,
+    });
+
+    const aiResponseContent = aiResponse.choices[0].message.content;
+    const [action, receiver] = aiResponseContent.split(" ");
+    console.log(action, receiver);
+  
   const graphApiUrl = "https://api-v2.lens.dev/";
   const apolloClient = getApolloClient(graphApiUrl);
   // console.log(req.data);
